@@ -1,0 +1,13 @@
+copies input to output, until input is empty
+awa
+wa awa awa awa awa awawawawawa   #lbl (15)
+ awa awa awawawa     #red
+ awawawawawa         #cnt
+ awa awawawa awa awa awa awa awawa  #sbm 1
+ awa awa awa awawa   #prn
+ awawawawawa         #cnt
+wa awa awawa awa     #eql
+wawawawawa           #TRM
+ awa awawawawa       #pop
+ awa awawawawa       #pop
+wa awa awa awawa awawawawawa  #JMP (15)

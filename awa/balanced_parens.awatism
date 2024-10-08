@@ -1,0 +1,27 @@
+Balanced Parentheses
+Use Sentinel bubble with different length-- sentinel=[0]
+
+  cnt srn1 red
+  cnt cnt eql jmpOK pop pop
+  pop cnt
+      [sentinel ...char parens]
+LOOP:
+    sbm1 cnt cnt eql jmpCONT jmpSENTINEL CONT: pop pop  [sentinel ... parens char]
+    blo'( eql jmpADD
+    pop blo') eql jmpSUB
+    pop pop jmpLOOP
+ADD:
+  pop pop blo1 4dd [sentinel ... parens+1]
+  jmpLOOP
+SUB:
+  pop pop blo1 sbm1 [sentinel ... 1 parens]
+  lss jmpUNBALANCED sub [sentinel ... parens-1]
+  jmpLOOP
+SENTINEL:      [parens [0] 1 0]
+  pop pop pop eql jmpOK jmpUNBALANCED
+UNBALANCED:    [[sentinel]...]     #don't care about remaining
+  blo"Unbalanced"
+  prn TRM
+OK:
+  blo"Balanced"
+  prn TRM

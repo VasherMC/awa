@@ -1,0 +1,78 @@
+
+#INPUT RULES
+blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\n"
+prn
+srn0
+INRULE: red        [rules [...01]]
+cnt cnt eql jmpINWORD pop pop
+blo"read\srule\s" prn dpl prn blo'\n prn
+srn1 sbm1 mrg      [rules]
+jmpINRULE
+
+NORULES_ERR:
+ pop pop
+ blo"Please\senter\sat\sleast\sone\srule\n"
+ prn jmpINRULE
+
+INWORD: pop pop pop   [rules]
+cnt cnt eql jmpNORULES_ERR pop pop
+
+blo"Enter\sstarting\sword\s(0/1\sonly)\n"
+prn red                    [rules word]
+
+#END_INPUT
+
+
+
+LOOP:       [rules word]
+#word empty? terminate
+    cnt cnt eql trm pop pop   [rules word]
+    sbm1                      [word rules]
+
+#get next rule (length known nonzero)
+
+#POPFRONT_DOUBLE [... [...list]]
+  cnt               [... [...l1] len]
+  sbm1 pop          [... len ... l1]
+  srn0              [... len ... l1 []]
+PF_D_LOOP:
+  sbm2 sbm2 cnt
+  cnt eql jmpPF_D_END   #sentinel?  [... l1 [rest] len 0 0]
+  pop pop           [... len ... l1 [l2] l3]
+  srn1 sbm1 mrg jmpPF_D_LOOP
+
+PF_CONT: pop pop   #see #POPFRONT below
+  sbm1 mrg jmpPF_LOOP  [... [len] ... item1 word']
+
+PF_D_END:
+  pop pop pop    [word Rule rules']
+
+  sbm2 sbm1      [rules' Rule word]
+
+#POPFRONT (word known nonempty, skip empty-check)
+  cnt srn1 sbm1 pop srn0   [... [len] ...item1 []]
+PF_LOOP:
+  sbm2 sbm2 cnt cnt   [... [len] ... item1 word' itemN 0 0]
+               OR     [... item1 word' [len] 1 0]
+  eql jmpPF_CONT pop pop
+  pop pop sbm1 [... word' first]
+
+#PF_END
+
+
+    blo'0 eql jmpNoAppend     [rules' Rule word (firstchar '0)]
+append the rule to the word--
+    pop pop
+    sbm1 dpl      [rules' word Rule Rule]
+    sbm2 sbm2     [rules' Rule Rule word]
+    mrg           [rules' Rule word']
+    cnt cnt
+    #fallthrough
+NoAppend:         [rules' Rule word char '0]
+    pop pop
+    sbm2          [word rules' Rule]
+    srn1 sbm1 mrg [word rules]
+    sbm1          [rules word]
+    dpl prn blo'\n prn
+    jmpLOOP
+
