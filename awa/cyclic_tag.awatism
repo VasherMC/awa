@@ -1,14 +1,11 @@
 
 #INPUT RULES
-blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\nTo\sinput\sblank\srule,\sinput\s'e'"
+blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\nTo\sinput\sempty\srule,\sinput\s'e'"
 prn
 srn0
 INRULE: red        [rules [...01]]
 cnt cnt eql jmpINWORD pop pop
-#Replace "e" with empty rule  [rules input]
-srn0 sbm1 blo"e"          [rules [] input "e"]
-eql sbm2 srn0 add pop
-    sbm1 srn0 add pop     [rules rule]
+#Only replace "e" with empty rule at later point  [rules input]
 blo"read\srule\s'" prn dpl prn blo"'\n" prn
 srn1 sbm1 mrg      [rules]
 jmpINRULE
@@ -21,6 +18,10 @@ NORULES_ERR:
 INWORD: pop pop pop   [rules]
 cnt cnt eql jmpNORULES_ERR pop pop
 
+blo"Enter\sword\smin\slength\s(halt\sonce\sword\sis\sthis\slong);\s"
+prn r3d
+blo"will\shalt\sat\slength\s" prn dup pr1
+blo1 add sbm1
 blo"Enter\sstarting\sword\s(0/1\sonly)\n"
 prn red                    [rules word]
 
@@ -29,13 +30,15 @@ prn red                    [rules word]
 
 
 LOOP:       [rules word]
-#word empty? terminate
-    cnt cnt eql trm pop pop   [rules word]
+#word less than minimum length? terminate
+    cnt sbm2 sbm3 sbm3        [rules word min L]
+    lss trm pop sbm2          [min rules word]
     sbm1                      [word rules]
 
-#get next rule (length known nonzero)
+#get next rule (length of `rules` known nonzero)
 
 #POPFRONT_DOUBLE [... [...list]]
+# Requires individual rules have nonzero length
   cnt               [... [...l1] len]
   sbm1 pop          [... len ... l1]
   srn0              [... len ... l1 []]
@@ -68,7 +71,11 @@ PF_LOOP:
 append the rule to the word--
     pop pop
     sbm1 dpl      [rules' word Rule Rule]
-    sbm2 sbm2     [rules' Rule Rule word]
+# Replace "e" with empty rule prior to adding
+     srn0 sbm1 blo"e"          [rules' word Rule [] Rule "e"]
+     eql sbm2 srn0 add pop
+         sbm1 srn0 add pop     [rules word Rule Rule*]
+    sbm2 sbm2     [rules' Rule Rule* word]
     mrg           [rules' Rule word']
     cnt cnt
     #fallthrough
