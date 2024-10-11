@@ -18,7 +18,7 @@ SUB:
   lss jmpUNBALANCED sub [sentinel ... parens-1]
   jmpLOOP
 SENTINEL:      [parens [0] 1 0]
-  pop pop pop eql jmpOK jmpUNBALANCED
+  pop pop pop eql jmpOK
 UNBALANCED:    [[sentinel]...]     #don't care about remaining
   blo"Unbalanced"
   prn TRM
