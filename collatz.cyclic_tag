@@ -18,5 +18,8 @@ Starting word is n=7 copies of 'a'
 path followed is 7->11->17->26->13->20->10->5->8->4->2->1 terminate
 
 Run with:
-py awa.py awa/cyclic_tag.awa <collatz.cyclic_tag
+python awa.py awa/cyclic_tag.awa <collatz.cyclic_tag
+
+To only show the collatz sequence:
+python awa.py awa/cyclic_tag.awa <collatz.cyclic_tag | split -n r/5/6 | egrep "^(100)+$"
 

@@ -1,6 +1,6 @@
 
 #INPUT RULES
-blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\nTo\sinput\sempty\srule,\sinput\s'e'"
+blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\nTo\sinput\sempty\srule,\sinput\s'e'\n"
 prn
 srn0
 INRULE: red        [rules [...01]]
@@ -18,18 +18,21 @@ NORULES_ERR:
 INWORD: pop pop pop   [rules]
 cnt cnt eql jmpNORULES_ERR pop pop
 
-blo"Enter\sword\smin\slength\s(halt\sonce\sword\sis\sthis\slong);\s"
+blo"Enter\sword\smin\slength\s(halt\sonce\sword\sis\sthis\slong)"
 prn r3d
-blo"will\shalt\sat\slength\s" prn dup pr1
 blo1 add sbm1
-blo"Enter\sstarting\sword\s(0/1\sonly)\n"
+blo"Enter\sstarting\sword\s(0/1\sonly)"
 prn red                    [rules word]
+blo'\n prn
 
 #END_INPUT
 
 
 
 LOOP:       [rules word]
+#Output current word
+    dpl prn blo'\n prn
+
 #word less than minimum length? terminate
     cnt sbm2 sbm3 sbm3        [rules word min L]
     lss trm pop sbm2          [min rules word]
@@ -84,6 +87,5 @@ NoAppend:         [rules' Rule word char '0]
     sbm2          [word rules' Rule]
     srn1 sbm1 mrg [word rules]
     sbm1          [rules word]
-    dpl prn blo'\n prn
     jmpLOOP
 
