@@ -14,6 +14,15 @@ at https://temptempai.github.io/AWA5.0/
 from copy import deepcopy
 import operator
 
+orig_print = print
+def print(*args,**kwargs):
+    """workaround for https://github.com/python/cpython/issues/79935"""
+    try:
+        orig_print(*args,**kwargs)
+    except (OSError, BrokenPipeError):
+        sys.stderr.close()
+        sys.exit()
+
 """See table of opcodes below"""
 Opcode = int
 Instruction = list[Opcode, int]
@@ -131,7 +140,7 @@ def run(instrs: AwaProgram, dbg=0):
         timestep+=1
         if dbg:
             print(abyss, ip, awatism_ins(instrs[ip]))
-            if timestep%20==0:
+            if timestep%100==0:
                 if input("continue? ").lower()[:1] in ["n","q"]:
                     running = False
         inst: Opcode = instrs[ip][0]
