@@ -1,11 +1,15 @@
 
 #INPUT RULES
-blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\n"
+blo"Enter\sRules\s(0/1\sonly)\sone\sat\sa\stime\nAfter\slast\srule,\sinput\sempty\nTo\sinput\sblank\srule,\sinput\s'e'"
 prn
 srn0
 INRULE: red        [rules [...01]]
 cnt cnt eql jmpINWORD pop pop
-blo"read\srule\s" prn dpl prn blo'\n prn
+#Replace "e" with empty rule  [rules input]
+srn0 sbm1 blo"e"          [rules [] input "e"]
+eql sbm2 srn0 add pop
+    sbm1 srn0 add pop     [rules rule]
+blo"read\srule\s'" prn dpl prn blo"'\n" prn
 srn1 sbm1 mrg      [rules]
 jmpINRULE
 
