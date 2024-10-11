@@ -1,0 +1,22 @@
+010001
+100
+100100100
+e
+e
+e
+
+3
+100100100100100100100
+
+Implements 2-tag system for Collatz
+a_ -> bc
+b_ -> a
+c_ -> aaa
+where a=100, b=010, c=001
+On reaching length of 3 (100) will terminate
+Starting word is n=7 copies of 'a'
+path followed is 7->11->17->26->13->20->10->5->8->4->2->1 terminate
+
+Run with:
+py awa.py awa/cyclic_tag.awa <collatz.cyclic_tag
+
