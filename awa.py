@@ -1,15 +1,40 @@
 
+"""
+AWA5.0 Interpreter
+Usage:
+    python awa.py file.awa
+
+For a description of the AWA5.0 language, see:
+https://github.com/TempTempai/AWA5.0
+
+Intended to be compatible with TempTempai's (javascript) interpreter
+at https://temptempai.github.io/AWA5.0/
+"""
+
 from copy import deepcopy
 import operator
 
-(NOP, PRN, PR1, RED, R3D, BLO, SBM, POP,
+"""See table of opcodes below"""
+Opcode = int
+Instruction = list[Opcode, int]
+AwaProgram = list[Instruction]
+
+ALL_OPS = (
+ NOP, PRN, PR1, RED, R3D, BLO, SBM, POP,
  DPL, SRN, MRG, ADD, SUB, MUL, DIV, CNT,
  LBL, JMP, EQL, LSS, GR8) = range(0x15)
 TRM = 0x1F
+ALL_OPS = (*ALL_OPS, TRM)
 
-def parse(txt):
+def parse(txt: str) -> AwaProgram:
+    """
+    Parse .awa text into instructions.
+    Each `awa` or `wa` corresponds to a 0/1 bit.
+    Instructions are 5 bits and arguments are 5 bits (except BLO).
+    """
     instrs = []
     txt = txt.lower()
+    # All programs begin with initial 'awa'
     i = txt.find('awa') + 3
     cur = sz = 0
     ins = []
@@ -25,14 +50,16 @@ def parse(txt):
             i+=2
         else:
             i+=1
-        #check if we have a complete instr
+        #check if we have a complete instruction
         if BLO in ins:
-            if sz==8:
+            if sz==8:  # blo takes an i8 argument
                 ins.append(cur)
                 cur = sz = 0
                 instrs.append(ins)
                 ins = []
         elif sz==5:
+            if len(ins)==0 and cur not in ALL_OPS:
+                print(f"WARNING: Invalid opcode 0x{cur:02x} ending at position {i}")
             ins.append(cur)
             cur = sz = 0
             if len(ins)==2 or ins[0] not in [JMP,LBL,BLO,SRN,SBM]:
@@ -50,15 +77,13 @@ AWATISM = {i:s for i,s in enumerate([
     'lbl', 'jmp', 'eql', 'lss', 'gr8'
 ])} | {0x1f:'trm'}
 
-def awatism_ins(ins):
+def awatism_ins(ins: Instruction) -> str:
     return AWATISM.get(ins[0],'INVALID') + (' '+str(ins[1])if len(ins)==2 else '')
-def awatism(code):
+def awatism(code: AwaProgram) -> str:
+    """Convert program to more readable, assembly-like "awatism" representation"""
     return "\n".join(map(awatism_ins, code))
 
-#example: [[LBL, 1], [RED], [DPL], [PRN], [CNT], [CNT], [EQL], [JMP, 1], [TRM]]
-""" (/owo)/
-"""
-
+# Begin interpreter implementation
 op_table = {
         EQL: operator.eq,
         LSS: operator.lt,
@@ -84,20 +109,19 @@ def str_PR(val, inst):
     else (' '*(inst==PR1)).join(str_PR(v,inst)for v in val[::-1]))
 
 def do_PR(inst, val):
-    #print(f"PRINTING: {val=} {inst=}")
+    """run PRN or PR1 instruction (output)"""
     print(str_PR(val,inst),end='')
 
 def do_RD(inst):
+    """Read input. Note only one line can be input at a time,
+    and the trailing newline is not included."""
     x = input('>')
     if inst==RED:
         return [AWASCII.find(c)for c in x if c in AWASCII][::-1]
     else:
         return int(x.replace('~','-'),10)
 
-#do_PR(do_RD(RED), PRN)
-#do_PR([do_RD(RED), do_RD(RED)], PRN)
-
-def run(instrs, dbg=0):
+def run(instrs: AwaProgram, dbg=0):
     ip = 0
     timestep = 0
     abyss = []
@@ -110,13 +134,14 @@ def run(instrs, dbg=0):
             if timestep%20==0:
                 if input("continue? ").lower()[:1] in ["n","q"]:
                     running = False
-        inst = instrs[ip][0]
+        inst: Opcode = instrs[ip][0]
         arg = instrs[ip][1] if len(instrs[ip])>1 else None
         # LBL, NOP: ignore
         if inst in (PRN, PR1): # ------------- I/O
             if len(abyss)>0:
                 do_PR(inst, abyss.pop())
-            #else error
+            else:
+                "Undefined behaviour"
         elif inst in (RED, R3D):
             abyss.append(do_RD(inst))
         elif inst == DPL: # --------------- STACK MANIP
@@ -197,15 +222,17 @@ def run(instrs, dbg=0):
             running = False
         ip += 1
 
+debug = 0
 if __name__ == "__main__":
     import sys
     if len(sys.argv)>1:
         fname = sys.argv[1]
         with open(fname) as f:
             r = f.read()
-        code = parse(r)
-        print(awatism(code))
-        input("press enter to run...")
-        run(code)
+        code: AwaProgram = parse(r)
+        if debug:
+            print(awatism(code))
+            input("press enter to run...")
+        run(code, debug)
 
 

@@ -1,4 +1,18 @@
-#convert awatism to awatalk
+r"""
+convert awatism to awatalk
+Usage:
+    python awatism.py <file.awatism >file.awa
+
+Immediate arguments must be provided without separating whitespace,
+e.g. `blo1` and not `blo 1`
+
+Implements extended Awatism syntax for BLO.
+AWASCII characters can be blown using single-quote syntax:
+    `blo'C  blo'B  blo'A  srn3  prn`  will print ABC
+AWASCII strings can be blown using double-quote syntax,
+though spaces and newlines must be escaped by \s and \n.
+    `blo"ABC" prn`  will print ABC
+"""
 
 import sys
 
