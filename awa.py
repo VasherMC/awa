@@ -87,7 +87,7 @@ AWATISM = {i:s for i,s in enumerate([
 ])} | {0x1f:'trm'}
 
 def awatism_ins(ins: Instruction) -> str:
-    return AWATISM.get(ins[0],'INVALID') + (' '+str(ins[1])if len(ins)==2 else '')
+    return AWATISM.get(ins[0],'INVALID') + (f" {ins[1]:>3d}"if len(ins)==2 else "    ")
 def awatism(code: AwaProgram) -> str:
     """Convert program to more readable, assembly-like "awatism" representation"""
     return "\n".join(map(awatism_ins, code))
@@ -139,7 +139,7 @@ def run(instrs: AwaProgram, dbg=0):
     while running and ip<len(instrs):
         timestep+=1
         if dbg:
-            print(abyss, ip, awatism_ins(instrs[ip]))
+            print(f"{ip:>4d}", awatism_ins(instrs[ip]),"  ", str(abyss).replace(' ',''))
             if timestep%100==0:
                 if input("continue? ").lower()[:1] in ["n","q"]:
                     running = False
