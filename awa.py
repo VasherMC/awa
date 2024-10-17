@@ -110,7 +110,12 @@ def binary_op(inst, top, nx):
         top = [top]*len(nx)
     if type(nx) is int:
         nx = [nx]*len(top)
-    return [binary_op(inst, a,b) for a,b in zip(top,nx)]
+    # reverse before passing to zip
+    # because we need to match top (last) elements
+    return [binary_op(inst, a,b) for a,b in zip(reversed(top),reversed(nx))][::-1]
+    #or truncate length:
+    #min_len = min(len(top),len(nx))
+    #return [binary_op(inst, a,b) for a,b in zip(top[-min_len:],nx[-min_len:])]
 
 #recursive
 def str_PR(val, inst):
