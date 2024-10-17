@@ -100,7 +100,7 @@ op_table = {
         ADD: operator.add,
         SUB: operator.sub,
         MUL: operator.mul,
-        DIV: lambda a,b: list(divmod(a,b)),
+        DIV: lambda a,b: list(divmod(a,b))[::-1],
 }
 #recursive
 def binary_op(inst, top, nx):
