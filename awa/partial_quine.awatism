@@ -30,17 +30,18 @@ Loop:
   sbm1 mrg pop                     [... [WIP] #bloprefix ["wa," awa] opN]
 
   ---(to_awa) [[1wa,0awa] N]
-   sbm1 cnt dpl 4dd srn1 sbm2      [[4] N [#1,#0]]
+   sbm1 cnt dpl 4dd sbm2           [4 N [#1,#0]]
 AWA_L:
-   cnt sbm2 dpl sbm4       [[#1,#0] [4] 2 N [#1,#0]]
-   pop sbm3 sbm3           [[#1,#0] [4] #1 #0 2 N]
-   div pop sbm5        [N/2 [#1,#0] [4] #1 #0 N%2]
+   cnt sbm2 dpl sbm4       [[#1,#0] 4 2 N [#1,#0]]
+   pop sbm3 sbm3           [[#1,#0] 4 #1 #0 2 N]
+   div pop sbm5        [N/2 [#1,#0] 4 #1 #0 N%2]
    (CMOV) cnt lss sbm3 pop srn0 mul pop sbm1 srn0 mul pop
-   sbm3           [bitX N/2 [#1,#0] [4]]
-   cnt srn1 gr8   [bitX N/2 [#1,#0] [4] [1]]    #non-equality for JS coercion
+   sbm3           [bitX N/2 [#1,#0] 4]
+   cnt eql        [bitX N/2 [#1,#0] 4 0]
    jmpAWA_END
-   sbm1 sub sbm2 jmpAWA_L          [[3] N/2 [#1,#0]]
-AWA_END: mrg mrg mrg srn0 mul srn6      #(optimize) include extra empty[] at top
+   pop srn1 cnt sbm1 pop sub sbm2  [3 N/2 [#1,#0]]
+   jmpAWA_L
+AWA_END: srn4 srn0 mul srn6      #(optimize) include extra empty[] at top
 
 
   [... [WIP] #blopref A]
