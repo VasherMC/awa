@@ -224,6 +224,16 @@ def run(instrs: AwaProgram, dbg=0):
                 print(f"ERROR: invalid jump target {arg}")
                 running = False
         elif inst in (EQL, LSS, GR8):
+            # When comparing ints and lists(double bubbles):
+            # - Python will error
+            # - Javascript does type coercion:
+            #   * array -> string (removes depth info): [[1],2,[3,4]]->"1,2,3,4"; []->""(0); [N]->"N"(N)
+            #   * If the string parses as an integer (no commas) then it is interpreted as int
+            #     - Otherwise the result is always false
+            # When comparing lists with lists:
+            # - Python compares lexicographically (depth-first)
+            # - Javascript always coerces both to strings (losing depth info), then lexicographically
+            #   * Except for ==, where Javascript always returns false (no coercion)
             if len(abyss) >= 2:
                 b, top = abyss[-2:]
                 #if not op_table[inst](top, b):
