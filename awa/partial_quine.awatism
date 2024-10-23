@@ -1,12 +1,10 @@
----srn0--[[]]
 
----all_blo_ops--[[OPS]]
+---all_blo_ops--[OPS]
 
-[[OPS]] -> [Sentinel=[1] OPS [WIP] opN]
- cnt srn1 cnt srn1 sbm2 [[1] [OPS] [lenOPS]]
- pop pop pop [[1] OPS]
+[...OPS] -> [Sentinel=-1 OPS [WIP] opN]
+ dpl cnt sub sbm0 [-1 OPS]   #optimize- we know last/top is nonzero
 
-  ---------------set up WIP:  [[S1, S2] [#bloprefix #blosuffix] ["wa," awa]]
+  ---------------set up (WIP)- [[S1, S2] #bloprefix ["wa," awa]]
       ---S1=non-escaped; S2=escaped; both start empty
       ---OPS are reversed (top/first on stack is last, so +to top as we go)
     srn0 srn0 srn2 [OPS... [S1,S2]]
@@ -18,54 +16,48 @@
       dpl sbm2 cnt cnt mul  [... 2 [0 1] [50] [0 1] 0]
       mrg sbm1 mrg srn2 4dd [... ["wa, " awa]]
 
-    dpl dpl pop mrg dpl mrg      [... ["wa," awa] ["wa," awa] (" awawa awawa)]
-    sbm1 cnt cnt mul srn1 4dd    [... ["wa," awa] (" awawa awawa) (" awa)]
-    dpl sbm2 sbm2 mrg            [... ["wa," awa] (" awa) (" awawa awawa awa)]
-    dpl sbm2 sbm1                [...   #blosuffix (" awawa awawa awa) (" awa)]
-    dpl dpl mrg sbm2 mrg mrg     [...   #blosuffix #bloprefix]
-    sbm1 srn2 sbm1 srn3          [... [WIP]]
-       --bloprefix = #blo =" awa awawa awawa awa awa awa"  = " awa" +blosuffix + " awa"*2
-       --blosuffix = #mrg =" awawa awawa awa"
- sbm1 [[1] OPS [WIP] opN]
+    dpl dpl mrg                [... ["wa," awa] ["wa," awa,"wa," awa]]    (" awawa awawa)
+    dpl cnt cnt mul srn1 4dd   [... ["wa," awa] (" awawa awawa) [" awa]]
+    dpl dpl dpl mrg mrg        [... ["wa," awa] (" awawa awawa) (" awa) (" awa awa awa)]
+    sbm2 mrg mrg               [... ["wa," awa] #bloprefix]
+    sbm1 srn3                  [... [WIP]]
+       --bloprefix = #blo =" awa awawa awawa awa awa awa" = (" awa" + " awawa"*2 + " awa"*3)
+ sbm1 [-1 OPS [WIP] opN]
 
 Loop:
- cnt srn1 eql jmpEND  [... opN [0]]
- dpl mrg sbm2 sbm2 dpl sbm3 4dd   [... [WIP] opN WIP[:2]]
-  sbm1 mrg pop [... [WIP] [#blopref #blosuff] ["wa," awa] opN]
+ cnt gr8 jmpEND  [... opN 0]
+ dpl srn2 sbm2 sbm2 dpl sbm3 4dd   [... [WIP] opN WIP[:2]]
+  sbm1 mrg pop                     [... [WIP] #bloprefix ["wa," awa] opN]
 
   ---(to_awa) [[1wa,0awa] N]
-   sbm1 cnt dpl 4dd srn1 cnt 4dd sbm2 [[5] N [#1,#0]]
+   sbm1 cnt dpl 4dd srn1 sbm2      [[4] N [#1,#0]]
 AWA_L:
-   cnt sbm2 dpl sbm4   [[#1,#0] [5] 2 N [#1,#0]]
-   pop sbm3 sbm3       [[#1,#0] [5] #1 #0 2 N]
-   div pop sbm5   [N/2 [#1,#0] [5] #1 #0 N%2]
+   cnt sbm2 dpl sbm4       [[#1,#0] [4] 2 N [#1,#0]]
+   pop sbm3 sbm3           [[#1,#0] [4] #1 #0 2 N]
+   div pop sbm5        [N/2 [#1,#0] [4] #1 #0 N%2]
    (CMOV) cnt lss sbm3 pop srn0 mul pop sbm1 srn0 mul pop
-   sbm3           [bitX N/2 [#1,#0] [5]]
-   cnt srn1 eql   [bitX N/2 [#1,#0] [5] [1]]
+   sbm3           [bitX N/2 [#1,#0] [4]]
+   cnt srn1 gr8   [bitX N/2 [#1,#0] [4] [1]]    #non-equality for JS coercion
    jmpAWA_END
-   sbm1 sub sbm2 jmpAWA_L
-AWA_END: mrg mrg mrg srn0 mul srn6      #--- include extra empty[] at top
+   sbm1 sub sbm2 jmpAWA_L          [[3] N/2 [#1,#0]]
+AWA_END: mrg mrg mrg srn0 mul srn6      #(optimize) include extra empty[] at top
 
 
-  [... [WIP] [#blopref #blosuff] A]
-  dpl sbm2 sbm1 pop   [... [WIP] A A #blopref #blosuff]
-  sbm2 srn3  [... [WIP] A #A]
-   sbm2 sbm2 pop [... A #A [S1,S2] [#blopref #blosuff] [wa,awa]]
-   srn2 sbm3 [... [wip] A #A [S1, S2]]
-   sbm1 srn1 mrg pop mrg [... [wip] A S1 (S2#A)]
-   sbm2 sbm1 mrg sbm1 [... [wip] (S1A) (S2#A)]
-   srn2 srn1 sbm1 mrg [... [WIP]]
-   sbm1 [... [WIP] op|sentinel]
+  [... [WIP] #blopref A]
+  dpl sbm3 sbm1       [... A [WIP] A #blopref]
+  mrg                 [... A [WIP] #A]
+   sbm2 pop           [... #A A [S1,S2] #blopref [wa,awa]]
+   sbm4 sbm4          [... (wip) #A A [S1, S2]]
+   pop sbm3 sbm1      [... (wip) S2 #A S1 A]
+   mrg sbm2 mrg       [... (wip) (S1A) (S2#A)]
+   srn2 sbm2 srn3     [... [WIP]]
+   sbm1               [... [WIP] op|sentinel]
 jmpLoop
-END: [[WIP] [1] [1]]
-sub pop pop pop [[S1 S2] [#pref #suff] [wa,awa]]
-  ----put #SRN0 and starting awa on top
- dpl pop mrg sbm1         [... (" awawa) [wa,awa]]
- cnt cnt mul srn1 4dd pop [... (" awawa) (" awa)]
- dpl sbm2 mrg             [... (" awa) (" awa awawa)]
- dpl mrg prn     (--- Initial awa and #srn)
- dpl dpl mrg dpl mrg mrg prn  (--#0)
-
-srn0 mul pop prn
+END:                  [[WIP] -1 0]
+pop pop pop           [[S1 S2] #blopref [wa,awa]]
+  ----put starting awa on top
+  sbm1 srn0 mul cnt mrg 4dd [[S1 S2] (" awa)]
+prn
+prn
 
 
